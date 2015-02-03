@@ -97,20 +97,41 @@ module Robotstxt
 			querystring = (!url.query.nil?) ? '?' + url.query : ''
 			url_path = url.path + querystring
 
+      did_match = false
+
 			@rules.each {|ua|
-				
-				if @robot_id == ua[0] || ua[0] == '*' 
+
+        # Direct Matching of UA	
+				if @robot_id == ua[0]
+
+          # We save this boolean to know if I must use the default '*'
+          did_match = true
 					
 					ua[1].each {|d|
-						
 						is_allow = false if url_path.match('^' + d ) || d == '/'
-						
 					}
 					
 				end
 				
 			}
-			is_allow
+
+      if !did_match
+  			@rules.each {|ua|
+
+          # Default UA	
+	  			if ua[0] == '*'
+
+					  ua[1].each {|d|
+						  is_allow = false if url_path.match('^' + d ) || d == '/'
+				  	}
+					
+				  end
+				
+			  }
+      end
+      
+			return is_allow
+
 		end
 		
 		# Analyze the robots.txt file to return an <tt>Array</tt> containing the list of XML Sitemaps URLs.
